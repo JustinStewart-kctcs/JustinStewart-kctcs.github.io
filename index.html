@@ -4,9 +4,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Data</title>
-    
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.7.7/handlebars.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.7.8/handlebars.min.js"></script> 
+
+    <script id="tableTemplate" type="text/x-handlebars-template">
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Major</th>
+                    <th>Midterm Score</th>
+                    <th>Final Score</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each students}}
+                <tr>
+                    <td>{{name}}</td>
+                    <td>{{major}}</td>
+                    <td>{{midterm}}</td>
+                    <td>{{final}}</td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+    </script>
 
     <style>
         table {
@@ -30,70 +52,39 @@
     <button id="busButton">Business Majors</button>
 
     <h3>We filter our dataset by major</h3>
-    
+
     <div id="studentTable"></div>
 
-    <script id="studentTemplate" type="text/x-handlebars-template">
-        <table>
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Major</th>
-                    <th>Midterm Score</th>
-                    <th>Final Score</th>
-                </tr>
-            </thead>
-            <tbody>
-                {{#each students}}
-                <tr>
-                    <td>{{name}}</td>
-                    <td>{{major}}</td>
-                    <td>{{midterm}}</td>
-                    <td>{{final}}</td>
-                </tr>
-                {{/each}}
-            </tbody>
-        </table>
-    </script>
-
     <script>
-        $(document).ready(function() {
-            var source = $("#studentTemplate").html();
-            var template = Handlebars.compile(source);
-            var students;
+        // Function to load and display students based on major
+        function loadStudents(major) 
+        {
+            fetch('cit5students.json')
+                .then(response => response.json())
+                .then(data => {
 
-            // Function to load and display students based on major
-            function loadStudents(major) {
-                var filteredStudents = students.filter(function(student) 
-                {
-                    return student.major === major;
+                    var source = document.getElementById("tableTemplate").innerHTML;
+                    var template = Handlebars.compile(source);
+
+                    var filteredStudents = data.filter(student => student.major === major);
+
+                    var html = template({ students: filteredStudents });
+
+                    document.getElementById('studentTable').innerHTML = html;
+                })
+                .catch(error => {
+                    console.error('Error loading student data:', error);
                 });
+        }
 
-                var context = { students: filteredStudents };
-                var html = template(context);
+        // Event listener for CIT Majors button
+        document.getElementById("citButton").addEventListener('click', function() {
+            loadStudents("CIT");
+        });
 
-                $("#studentTable").html(html);
-            }
-
-            $.ajax({
-                url: "cit5students.json",
-                dataType: "json",
-                success: function(data) {
-                    students = data;
-                }
-            });
-
-            // Event listener for CIT Majors button
-            $("#citButton").click(function() 
-            {
-                loadStudents("CIT");
-            });
-
-            // Event listener for Business Majors button
-            $("#busButton").click(function() 
-            {
-                loadStudents("BUS");
-            });
+        // Event listener for Business Majors button
+        document.getElementById("busButton").addEventListener('click', function() {
+            loadStudents("BUS");
         });
     </script>
 </body>
