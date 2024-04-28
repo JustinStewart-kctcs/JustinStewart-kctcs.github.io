@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>25mph or More Over Page</title>
+
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+</head>
+
+<body>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="#">Traffic Tickets</a>
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="index.html">All Data</a>
+      </li>
+      <li class="nav-item active">
+        <a class="nav-link" href="25over.html">25mph or more over</a>
+      </li>
+    </ul>
+  </nav>
+
+  <div class="container mt-4">
+    <h1>Traffic Tickets 25mph or More Over the Limit</h1>
+    <div id="app">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Ticket ID</th>
+            <th>Stop Date</th>
+            <th>Actual Speed</th>
+            <th>Posted Speed</th>
+            <th>Age</th>
+            <th>Violator Sex</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="ticket in filteredTickets">
+            <td>{{ ticket.tid }}</td>
+            <td>{{ ticket.stop_date }}</td>
+            <td>{{ ticket.actual_speed }}</td>
+            <td>{{ ticket.posted_speed }}</td>
+            <td>{{ ticket.age }}</td>
+            <td>{{ ticket.violator_sex }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    new Vue({
+      el: '#app',
+      data: {
+        tickets: [],
+        filteredTickets: []
+      },
+      mounted() {
+        fetch('tickets1.json')
+          .then(response => response.json())
+          .then(data => {
+            this.tickets = data;
+            this.filterTickets();
+          })
+      },
+      methods: {
+        filterTickets() {
+          this.filteredTickets = this.tickets.filter(ticket => ticket.actual_speed >= (ticket.posted_speed + 25));
+        }
+      }
+    })
+  </script>
+
+</body>
+</html>
